@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        font-family: 'Google Sans', Arial, sans-serif;
+        line-height: 1.6;
+        color: #202124;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        color: #1a73e8;
+        margin-bottom: 30px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+      }
+      input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        font-size: 16px;
+        transition: border 0.3s;
+      }
+      input:focus {
+        outline: none;
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 2px #cfe8fc;
+      }
+      button {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 14px;
+        width: 100%;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #1765cc;
+      }
+      .message {
+        padding: 12px;
+        border-radius: 4px;
+        margin-top: 20px;
+        text-align: center;
+        display: none;
+      }
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Учет расходов</h1>
+    <form id="expenseForm">
+      <div class="form-group">
+        <label for="fullName">ФИО</label>
+        <input type="text" id="fullName" name="fullName" required 
+               placeholder="Иванов Иван Иванович">
+      </div>
+      
+      <div class="form-group">
+        <label for="expenseItem">Статья расходов</label>
+        <input type="text" id="expenseItem" name="expenseItem" required
+               placeholder="Канцелярия">
+      </div>
+      
+      <div class="form-group">
+        <label for="amount">Сумма (руб.)</label>
+        <input type="number" id="amount" name="amount" required step="0.01"
+               min="0.01" placeholder="1000.50">
+      </div>
+      
+      <div class="form-group">
+        <label for="photoLink">Ссылка на фото</label>
+        <input type="url" id="photoLink" name="photoLink" required
+               placeholder="https://example.com/photo.jpg">
+      </div>
+      
+      <button type="submit">Сохранить данные</button>
+    </form>
+    
+    <div id="message" class="message"></div>
+
+    <script>
+      document.getElementById('expenseForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const messageEl = document.getElementById('message');
+        messageEl.style.display = 'none';
+        
+        const formData = {
+          fullName: this.fullName.value,
+          expenseItem: this.expenseItem.value,
+          amount: this.amount.value,
+          photoLink: this.photoLink.value
+        };
+        
+        google.script.run
+          .withSuccessHandler(function(response) {
+            messageEl.textContent = response.message;
+            messageEl.className = 'message ' + response.status;
+            messageEl.style.display = 'block';
+            
+            if (response.status === 'success') {
+              this.reset();
+            }
+          })
+          .withFailureHandler(function(error) {
+            messageEl.textContent = 'Ошибка: ' + error.message;
+            messageEl.className = 'message error';
+            messageEl.style.display = 'block';
+          })
+          .submitForm(formData);
+      });
+    </script>
+  </body>
+</html>
