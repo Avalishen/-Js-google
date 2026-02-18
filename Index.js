@@ -1,37 +1,40 @@
+// ЭТО ЕДИНСТВЕННАЯ функция, которая нужна!
 function doGet() {
-  return HtmlService.createHtmlOutputFromFile('Index')
-    .setTitle('Форма учета расходов')
-    .setWidth(400)
-    .setHeight(500);
+  return HtmlService.createHtmlOutputFromFile('Form')
+    .setTitle('Учет расходов')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 function submitForm(data) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const headers = ['ФИО', 'Статья расходов', 'Сумма', 'Ссылка на фото'];
+    // Сохраняем в ТУ ЖЕ таблицу, из которой запущено приложение
+    const ss = SpreadsheetApp.openByUrl(data.sheetUrl);
+    const sheet = ss.getActiveSheet();
     
-    // Проверка и установка заголовков
-    const firstRow = sheet.getRange(1, 1, 1, 4).getValues()[0];
-    if (!firstRow.some(cell => cell)) {
-      sheet.getRange(1, 1, 1, 4).setValues([headers]);
+    // Добавляем заголовки при первом запуске
+    if (!sheet.getRange("A1").getValue()) {
+      sheet.getRange("A1:F1").setValues([[
+        "Дата", "ФИО", "Статья расходов", "Сумма", "Комментарий", "Ссылка на фото"
+      ]]);
     }
     
-    // Валидация суммы
-    const amount = parseFloat(data.amount);
-    if (isNaN(amount)) {
-      throw new Error('Сумма должна быть числом');
-    }
-    
-    // Добавление данных
+    // Добавляем данные
     sheet.appendRow([
-      data.fullName.trim(),
-      data.expenseItem.trim(),
-      amount,
-      data.photoLink.trim()
+      data.datetimeLocal,
+      data.fullName,
+      data.expenseItem,
+      Number(data.amount),
+      data.comment,
+      data.photoLink
     ]);
     
-    return { status: 'success', message: 'Данные сохранены!' };
-  } catch (error) {
-    return { status: 'error', message: error.message };
+    return { success: true, message: "✅ Данные сохранены!" };
+  } catch (e) {
+    return { success: false, message: "❌ Ошибка: " + e.message };
   }
+}
+
+// Вспомогательная функция для получения URL таблицы
+function getSpreadsheetUrl() {
+  return SpreadsheetApp.getActiveSpreadsheet().getUrl();
 }
