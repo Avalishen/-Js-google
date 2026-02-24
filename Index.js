@@ -1,4 +1,4 @@
-const EXPENSES_FOLDER_ID = "1nVEej4-ibBwOd5jHKBehRY1_h_LaOhfB"; // Например: "1xYzAbcDefGhIjKlMnOpQrStUvWxYz"
+const EXPENSES_FOLDER_ID = "ID Folder"; // Например: "1xYzAbcDefGhIjKlMnOpQrStUvWxYz"
 
 function doGet() {
   return HtmlService.createHtmlOutputFromFile("Form")
@@ -37,7 +37,7 @@ function submitForm(data) {
       Number(data.amount),
       data.comment,
       data.photoFileId
-        ? `=HYPERLINK("https://drive.google.com/file/d/${data.photoFileId}/view", "Посмотреть чек")`
+        ? `=HYPERLINK("https://drive.google.com/file/d/${data.photoFileId}/view"; "Посмотреть чек")`
         : "",
     ]);
 
