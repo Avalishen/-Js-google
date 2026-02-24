@@ -3,121 +3,85 @@
 
 <head>
   <base target="_top">
+  <script src="https://apis.google.com/js/api.js"></script>
   <style>
     body {
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       padding: 20px;
       max-width: 500px;
-      margin: auto;
+      margin: 0 auto;
     }
 
     .container {
       border: 1px solid #ddd;
-      padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
+      padding: 25px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
     h1 {
       text-align: center;
       color: #1a73e8;
+      margin-bottom: 25px;
     }
 
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     label {
-      font-weight: bold;
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #5f6368;
     }
 
     input {
-      width: 100%;
-      padding: 8px;
+      width: 93%;
+      padding: 12px;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      font-size: 16px;
     }
 
-    .file-picker {
-      border: 2px dashed #ccc;
-      padding: 15px;
-      text-align: center;
-      cursor: pointer;
-      margin-bottom: 10px;
-    }
-
-    .selected-file {
-      display: none;
-      background: #e8f0fe;
-      padding: 8px;
-      margin-top: 5px;
+    input:focus {
+      outline: none;
+      border-color: #1a73e8;
+      box-shadow: 0 0 0 2px #cfe8fc;
     }
 
     button {
-      width: 100%;
-      padding: 10px;
-      background: #1a73e8;
-      color: #fff;
+      background-color: #1a73e8;
+      color: white;
       border: none;
+      padding: 14px 24px;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 500;
       cursor: pointer;
-      margin-top: 10px;
+      width: 100%;
     }
 
     button:hover {
-      background: #1558b0;
+      background-color: #1765cc;
     }
 
     .message {
-      display: none;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 20px;
       text-align: center;
-      padding: 8px;
-      margin-top: 10px;
+      display: none;
     }
 
     .success {
-      background: #e6f4ea;
+      background-color: #e6f4ea;
       color: #2e7d32;
     }
 
     .error {
-      background: #fce8e6;
-      color: #c62828;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, .5);
-    }
-
-    .modal-content {
-      background: #fff;
-      margin: 10% auto;
-      padding: 20px;
-      width: 90%;
-      max-width: 400px;
-      max-height: 70vh;
-      overflow-y: auto;
-    }
-
-    .file-item {
-      padding: 10px;
-      border-bottom: 1px solid #eee;
-      cursor: pointer;
-    }
-
-    .file-item:hover {
-      background: #f5f5f5;
-    }
-
-    .close {
-      float: right;
-      cursor: pointer;
-      font-weight: bold;
+      background-color: #fce8e6;
+      color: #d32f2f;
     }
   </style>
 </head>
@@ -127,97 +91,183 @@
     <h1>Учет расходов</h1>
 
     <div class="form-group">
+      <label>Дата</label>
+      <input type="datetime-local" id="datetimeLocal" placeholder="Дата формата ДД-ММ-ГГГГ">
+    </div>
+
+    <div class="form-group">
       <label>ФИО</label>
-      <input id="fullName">
+      <input type="text" id="fullName" placeholder="Иванов Иван Иванович">
     </div>
 
     <div class="form-group">
       <label>Статья расходов</label>
-      <input id="expenseItem">
+      <input type="text" id="expenseItem" placeholder="Канцелярские товары">
     </div>
 
     <div class="form-group">
-      <label>Сумма</label>
-      <input id="amount" type="number" step="0.01">
+      <label>Сумма (руб.)</label>
+      <input type="number" id="amount" placeholder="1000.50" step="0.01" min="0.01">
     </div>
 
+    <div class="form-group">
+      <label>Комментарий</label>
+      <input type="text" id="comment" placeholder="Ваш Комментарий">
+    </div>
+
+    <!-- БЛОК ВЫБОРА ФАЙЛА -->
     <div class="form-group">
       <label>Фото чека</label>
-      <div class="file-picker" onclick="openPicker()">Выбрать чек</div>
+      <div class="file-picker" onclick="openFilePicker()">
+        <img src="https://ssl.gstatic.com/docs/common/drive_quickaccess_1x.png" width="48" style="margin-bottom: 10px;">
+        <p>Нажмите, чтобы выбрать чек из папки</p>
+      </div>
+
       <div class="selected-file" id="selectedFile">
         <span id="fileName"></span>
-        <button onclick="clearFile()" style="background:#d32f2f">Удалить</button>
+        <button type="button" onclick="clearFileSelection()"
+          style="float: right; padding: 2px 8px; background: #f44336;">Удалить</button>
       </div>
     </div>
 
-    <button onclick="submitData()">Добавить</button>
+    <button onclick="submitData()">Добавить в таблицу</button>
     <div id="message" class="message"></div>
   </div>
 
-  <div class="modal" id="modal">
+  <!-- МОДАЛЬНОЕ ОКНО ДЛЯ ВЫБОРА ФАЙЛА -->
+  <div id="fileModal" class="modal">
     <div class="modal-content">
-      <span class="close" onclick="closePicker()">×</span>
+      <span class="close-modal" onclick="closeFilePicker()">&times;</span>
       <h3>Выберите чек</h3>
-      <div id="fileList"></div>
+      <div id="fileList" style="margin-top: 15px;"></div>
     </div>
   </div>
 
-  <input type="hidden" id="photoFileId">
   <input type="hidden" id="sheetUrl">
+  <input type="hidden" id="photoFileId">
 
   <script>
-    google.script.run.withSuccessHandler(url => {
-      document.getElementById('sheetUrl').value = url;
-    }).getSpreadsheetUrl();
+    // Загружаем URL таблицы
+    google.script.run
+      .withSuccessHandler(function (url) {
+        document.getElementById('sheetUrl').value = url;
+      })
+      .getSpreadsheetUrl();
 
-    function openPicker() {
-      document.getElementById('modal').style.display = 'block';
-      google.script.run.withSuccessHandler(renderFiles).getExpenseFiles();
+    // Открываем модальное окно выбора файла
+    function openFilePicker() {
+      document.getElementById('fileModal').style.display = 'block';
+
+      google.script.run
+        .withSuccessHandler(renderFileList)
+        .withFailureHandler(function (error) {
+          showMessage('error', 'Ошибка загрузки файлов: ' + error.message);
+        })
+        .getExpenseFiles();
     }
 
-    function closePicker() { document.getElementById('modal').style.display = 'none'; }
+    // Закрываем модальное окно
+    function closeFilePicker() {
+      document.getElementById('fileModal').style.display = 'none';
+    }
 
-    function renderFiles(files) {
-      const list = document.getElementById('fileList');
-      list.innerHTML = '';
-      if (!files.length) { list.innerHTML = 'Файлов нет'; return; }
-      files.forEach(f => {
-        const div = document.createElement('div');
-        div.className = 'file-item';
-        div.textContent = f.name;
-        div.onclick = () => {
-          document.getElementById('photoFileId').value = f.id;
-          document.getElementById('fileName').textContent = f.name;
-          document.getElementById('selectedFile').style.display = 'block';
-          closePicker();
+    // Отображаем список файлов
+    function renderFileList(files) {
+      const fileList = document.getElementById('fileList');
+      fileList.innerHTML = '';
+
+      if (files.length === 0) {
+        fileList.innerHTML = '<p>В папке нет файлов. Загрузите чеки в папку Google Диска.</p>';
+        return;
+      }
+
+      files.forEach(file => {
+        const item = document.createElement('div');
+        item.className = 'file-item';
+        item.innerHTML = `
+            <img src="${file.icon}" class="file-icon">
+            ${file.name}
+          `;
+        item.onclick = function () {
+          selectFile(file);
+          closeFilePicker();
         };
-        list.appendChild(div);
+        fileList.appendChild(item);
       });
     }
 
-    function clearFile() {
+    // Выбираем файл
+    function selectFile(file) {
+      document.getElementById('photoFileId').value = file.id;
+      document.getElementById('fileName').textContent = file.name;
+      document.getElementById('selectedFile').style.display = 'block';
+    }
+
+    // Убираем выбор файла
+    function clearFileSelection() {
       document.getElementById('photoFileId').value = '';
       document.getElementById('selectedFile').style.display = 'none';
     }
 
+    // Отправляем данные
     function submitData() {
+      const datetimeLocal = document.getElementById('datetimeLocal').value.trim();
+      const fullName = document.getElementById('fullName').value.trim();
+      const expenseItem = document.getElementById('expenseItem').value.trim();
+      const amount = document.getElementById('amount').value.trim();
+      const comment = document.getElementById('comment').value.trim();
+      const photoFileId = document.getElementById('photoFileId').value;
+
+      // Валидация
+      if (!datetimeLocal || !fullName || !expenseItem || !amount || !comment || !photoFileId) {
+        showMessage('error', '⚠️ Заполните все поля!');
+        return;
+      }
+
+      if (isNaN(amount) || Number(amount) <= 0) {
+        showMessage('error', '⚠️ Сумма должна быть положительным числом!');
+        return;
+      }
+
       const data = {
-        fullName: fullName.value.trim(),
-        expenseItem: expenseItem.value.trim(),
-        amount: amount.value,
-        photoFileId: photoFileId.value,
-        sheetUrl: sheetUrl.value
+        datetimeLocal: datetimeLocal,
+        fullName: fullName,
+        expenseItem: expenseItem,
+        amount: amount,
+        comment: comment,
+        photoFileId: photoFileId,
+        sheetUrl: document.getElementById('sheetUrl').value
       };
-      if (!data.fullName || !data.expenseItem || !data.amount) { showMsg('error', 'Заполните все поля'); return; }
-      google.script.run.withSuccessHandler(r => showMsg(r.success ? 'success' : 'error', r.message)).submitForm(data);
+
+      google.script.run
+        .withSuccessHandler(function (response) {
+          showMessage(response.success ? 'success' : 'error', response.message);
+          if (response.success) {
+            document.getElementById('datetimeLocal').value = '';
+            document.getElementById('fullName').value = '';
+            document.getElementById('expenseItem').value = '';
+            document.getElementById('amount').value = '';
+            document.getElementById('comment').value = '';
+            document.getElementById('photoFileId').value = '';
+            clearFileSelection();
+          }
+        })
+        .withFailureHandler(function (error) {
+          showMessage('error', '❌ Критическая ошибка: ' + error.message);
+        })
+        .submitForm(data);
     }
 
-    function showMsg(type, text) {
-      const m = document.getElementById('message');
-      m.className = 'message ' + type;
-      m.textContent = text;
-      m.style.display = 'block';
-      setTimeout(() => m.style.display = 'none', 4000);
+    function showMessage(type, message) {
+      const msg = document.getElementById('message');
+      msg.className = 'message ' + type;
+      msg.textContent = message;
+      msg.style.display = 'block';
+
+      // Автоматическое скрытие через 5 сек
+      setTimeout(() => {
+        msg.style.display = 'none';
+      }, 5000);
     }
   </script>
 </body>

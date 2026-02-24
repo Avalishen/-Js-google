@@ -6,23 +6,36 @@ function doGet() {
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
-// Отправка данных в Google Sheets
 function submitForm(data) {
   try {
+    // Сохраняем в ТУ ЖЕ таблицу, из которой запущено приложение
     const ss = SpreadsheetApp.openByUrl(data.sheetUrl);
     const sheet = ss.getActiveSheet();
 
-    // Заголовки, если пусто
+    // Добавляем заголовки при первом запуске
     if (!sheet.getRange("A1").getValue()) {
+      //А1:F1 это диапазон ячеек в самой таблице
       sheet
-        .getRange("A1:D1")
-        .setValues([["ФИО", "Статья расходов", "Сумма", "Фото чека"]]);
+        .getRange("A1:F1")
+        .setValues([
+          [
+            "Дата",
+            "ФИО",
+            "Статья расходов",
+            "Сумма",
+            "Комментарий",
+            "Ссылка на фото",
+          ],
+        ]);
     }
 
+    // Добавляем данные
     sheet.appendRow([
+      data.datetimeLocal,
       data.fullName,
       data.expenseItem,
       Number(data.amount),
+      data.comment,
       data.photoFileId
         ? `=HYPERLINK("https://drive.google.com/file/d/${data.photoFileId}/view", "Посмотреть чек")`
         : "",
