@@ -251,14 +251,18 @@
       files.forEach(file => {
         const item = document.createElement('div');
         item.className = 'file-item';
+        const iconURL = `https://drive.google.com/file/d/${file.id}/view`;
+
         item.innerHTML = `
-            <img src="${file.icon}" class="file-icon">
-            ${file.name}
-          `;
+        <img src="${iconURL}" class="file-icon">
+        ${file.name}
+      `;
+
         item.onclick = function () {
           selectFile(file);
           closeFilePicker();
         };
+
         fileList.appendChild(item);
       });
     }
