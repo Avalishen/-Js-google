@@ -1,4 +1,3 @@
-// УКАЖИТЕ ID ВАШЕЙ ПАПКИ С ЧЕКАМИ ЗДЕСЬ ↓
 const EXPENSES_FOLDER_ID = "ВСТАВЬТЕ_ID_ВАШЕЙ_ПАПКИ"; // Например: "1xYzAbcDefGhIjKlMnOpQrStUvWxYz"
 
 function doGet() {
