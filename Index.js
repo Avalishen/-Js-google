@@ -1,4 +1,4 @@
-const EXPENSES_FOLDER_ID = "ВСТАВЬТЕ_ID_ВАШЕЙ_ПАПКИ"; // Например: "1xYzAbcDefGhIjKlMnOpQrStUvWxYz"
+const EXPENSES_FOLDER_ID = "1nVEej4-ibBwOd5jHKBehRY1_h_LaOhfB"; // Например: "1xYzAbcDefGhIjKlMnOpQrStUvWxYz"
 
 function doGet() {
   return HtmlService.createHtmlOutputFromFile("Form")
@@ -41,28 +41,16 @@ function getSpreadsheetUrl() {
 
 // Получаем список файлов из папки
 function getExpenseFiles() {
-  try {
-    const folder = DriveApp.getFolderById(EXPENSES_FOLDER_ID);
-    const files = folder.getFiles();
-    const fileList = [];
-
-    while (files.hasNext()) {
-      const file = files.next();
-
-      // Только изображения
-      if (file.getMimeType().startsWith("image/")) {
-        fileList.push({
-          id: file.getId(),
-          name: file.getName(),
-          url: file.getUrl(),
-          icon: file.getThumbnailLink(),
-        });
-      }
-    }
-
-    return fileList;
-  } catch (e) {
-    console.error("Ошибка доступа к папке:", e);
-    return [];
+  const folder = DriveApp.getFolderById(EXPENSES_FOLDER_ID);
+  const files = folder.getFiles();
+  const fileList = [];
+  while (files.hasNext()) {
+    const file = files.next();
+    fileList.push({
+      id: file.getId(),
+      name: file.getName(),
+      mimeType: file.getMimeType(),
+    });
   }
+  return fileList;
 }
