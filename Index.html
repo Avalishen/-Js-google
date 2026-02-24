@@ -83,6 +83,73 @@
       background-color: #fce8e6;
       color: #d32f2f;
     }
+
+    .file-picker {
+      border: 2px dashed #dadce0;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .file-picker:hover {
+      border-color: #1a73e8;
+      background-color: #f8fafd;
+    }
+
+    .selected-file {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #e8f0fe;
+      border-radius: 4px;
+    }
+
+    .file-icon {
+      width: 24px;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background-color: white;
+      margin: 10% auto;
+      padding: 20px;
+      width: 80%;
+      max-width: 500px;
+      border-radius: 8px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .file-item {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+    }
+
+    .file-item:hover {
+      background-color: #f5f5f5;
+    }
+
+    .close-modal {
+      float: right;
+      font-weight: bold;
+      cursor: pointer;
+    }
   </style>
 </head>
 
